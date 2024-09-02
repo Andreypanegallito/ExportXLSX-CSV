@@ -1,27 +1,78 @@
 # ExportXLSXCSV
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.3.
+Repositório para explicar e demostrar como exportar para xlsx e csv usando a lib xlsx, link: [SheetJS](https://sheetjs.com/)
 
-## Development server
+É um breve resumo que pode te ajudar a dar o pontapé inicial.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Primeiros passos
 
-## Code scaffolding
+Após estar com seu projeto criado, será necessário instalar a lib do xlsx
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Comando: `npm install xlsx`
 
-## Build
+## Código no html e javascript
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Para poder funcionar, você deve colocar a tabela no html e chamar a função que irei deixar para fazer a conversão da tabela html para excel ou CSV.
 
-## Running unit tests
+### Tabela no html
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+<table id='table' class='table'>
+  <thead>
+    <tr>
+      <th>Teste</th>
+      <th>Descrição</th>
+      <th>Data</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Teste de Velocidade</td>
+      <td>Avalia a rapidez de execução de tarefas</td>
+      <td>01/09/2024</td>
+      <td>Aprovado</td>
+    </tr>
+  </tbody>
+</table>
+```
 
-## Running end-to-end tests
+### Função no javascript
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Esse exemplo é para exportar somente uma tabela do html
 
-## Further help
+```
+exportToXLSX() {
+    const wb = XLSX.utils.book_new();
+    let tables = document.getElementById('table') as any;
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.table_to_sheet(tables),
+      'Planilha'
+    );
+
+    XLSX.writeFile(wb, 'planilha.xlsx');
+  }
+```
+
+### Função no javascript para exportar 2 ou mais tabelas
+
+Esse exemplo é para exportar duas ou mais tabelas, porém, para cada tabela será criado uma planilha/workbook
+
+```
+exportToXLSXWithWorkbook() {
+  const wb = XLSX.utils.book_new();
+  let tables = document.querySelectorAll('.table') as any;
+
+  tables.forEach((table: any, i: any) => {
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.table_to_sheet(table),
+      `Planilha ${i + 1}`
+    );
+  });
+
+  XLSX.writeFile(wb, 'planilhas.xlsx');
+}
+```
